@@ -1,0 +1,90 @@
+pragma language_version >= 0.28;
+
+import CompactStandardLibrary;
+
+// Private Tickets on Midnight.
+// A guest proves, in zero knowledge, that they hold a valid unused ticket for this event
+// without revealing who they are or WHICH ticket is theirs. Check-in publishes only a
+// one-time nullifier, so the same ticket cannot be scanned twice.
+
+export sealed ledger host: Bytes<32>;           // DApp-specific host key (hash of host secret)
+export sealed ledger maxTickets: Uint<16>;
+export sealed ledger resaleCap: Uint<32>;       // max resale price, in cents (public rule)
+export sealed ledger maxResales: Uint<8>;       // max number of private hand-offs per ticket
+export ledger tickets: HistoricMerkleTree<10, Bytes<32>>;  // commitments only
+export ledger nullifiers: Set<Bytes<32>>;       // spent tickets (checked in or resold)
+export ledger issued: Counter;
+export ledger checkedIn: Counter;
+export ledger resold: Counter;
+
+// Private inputs. They are supplied by the caller's machine and are never published.
+witness localSecret(): Bytes<32>;
+witness ticketHops(): Uint<8>;                   // how many times this ticket was resold
+witness ticketPath(leaf: Bytes<32>): MerkleTreePath<10, Bytes<32>>;
+
+constructor(max: Uint<16>, cap: Uint<32>, resales: Uint<8>) {
+  assert(max > 0, "ticket supply must be positive");
+  host = disclose(hostKey(localSecret()));
+  maxTickets = disclose(max);
+  resaleCap = disclose(cap);
+  maxResales = disclose(resales);
+}
+
+pure circuit hostKey(secret: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "pt:host:"), secret]);
+}
+
+// A guest keeps `secret` and gives the host only preimage = H(secret).
+export pure circuit preimage(secret: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "pt:pre:"), secret]);
+}
+
+// The leaf that goes in the Merkle tree: binds the guest's preimage and the resale count.
+pure circuit leafOf(pre: Bytes<32>, hops: Uint<8>): Bytes<32> {
+  return persistentHash<[Bytes<32>, Bytes<32>, Uint<8>]>([pad(32, "pt:leaf:"), pre, hops]);
+}
+
+// One-time tag for a ticket. It depends only on the guest's secret, so it is the same
+// whether the ticket is checked in or handed on, and cannot be linked back to the leaf.
+pure circuit nullifierOf(secret: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "pt:null:"), secret]);
+}
+
+// Host issues a ticket for a guest-supplied pre-commitment (host never learns the secret).
+export circuit issueTicket(pre: Bytes<32>): [] {
+  assert(host == hostKey(localSecret()), "only the host can issue tickets");
+  assert(issued.lessThan(maxTickets as Uint<64>), "sold out");
+  tickets.insert(disclose(leafOf(pre, 0)));
+  issued.increment(1);
+}
+
+// Shared proof: the caller holds an unspent leaf in the tree. Returns the nullifier.
+circuit proveUnspent(): Bytes<32> {
+  const secret = localSecret();
+  const hops = ticketHops();
+  const leaf = leafOf(preimage(secret), hops);
+  const path = ticketPath(leaf);
+  assert(path.leaf == leaf, "witness path is for a different ticket");
+  assert(tickets.checkRoot(disclose(merkleTreePathRoot<10, Bytes<32>>(path))), "not a valid ticket");
+  const nf = nullifierOf(secret);
+  assert(!nullifiers.member(disclose(nf)), "ticket already used");
+  return nf;
+}
+
+// Door check-in: zero-knowledge membership + one-time nullifier.
+export circuit checkIn(): [] {
+  const nf = proveUnspent();
+  nullifiers.insert(disclose(nf));
+  checkedIn.increment(1);
+}
+
+// Optional capped private resale: spend my ticket, mint one for the buyer's pre-commitment.
+// The price is a public rule check (<= cap), not a payment: see README limits.
+export circuit resellTicket(buyerPre: Bytes<32>, price: Uint<32>): [] {
+  assert(price <= resaleCap, "price is above the resale cap");
+  assert(ticketHops() < maxResales, "this ticket has reached its resale limit");
+  const nf = proveUnspent();
+  nullifiers.insert(disclose(nf));
+  tickets.insert(disclose(leafOf(buyerPre, (ticketHops() + 1) as Uint<8>)));
+  resold.increment(1);
+}

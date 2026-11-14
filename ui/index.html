@@ -1,0 +1,43 @@
+<!doctype html><meta charset=utf-8><title>Private Tickets on Midnight</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+body{font:15px system-ui;background:#0b0b14;color:#e8e8f2;margin:0;padding:20px}
+h1{margin:0 0 4px}.sub{color:#9aa;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.card{background:#15152a;border:1px solid #2a2a4a;border-radius:12px;padding:14px}
+h2{font-size:15px;margin:0 0 10px;color:#a99bff}
+input,button{font:inherit;padding:7px 10px;border-radius:8px;border:1px solid #3a3a6a;background:#0f0f20;color:#fff;margin:2px 0}
+button{background:#5b4bff;border:0;cursor:pointer}button:hover{background:#7466ff}
+.row{display:flex;gap:6px;flex-wrap:wrap}code{color:#7fffd4;word-break:break-all}
+.log div{padding:4px 0;border-bottom:1px solid #222244}.ok{color:#8f8}.no{color:#f88}
+.pill{display:inline-block;background:#222250;padding:2px 8px;border-radius:99px;margin:2px;font-size:13px}
+</style>
+<h1>🎟️ Private Tickets <small style="color:#9aa">on Midnight (Compact · local circuit run, no mainnet)</small></h1>
+<div class=sub>Prove you hold a valid, unused ticket without revealing who you are or which ticket. Check-in is a one-time nullifier.</div>
+<div class=grid>
+<div class=card><h2>1 · Host: issue tickets</h2>
+ <div class=row><input id=name placeholder="guest label (local only)" value="alice"><button onclick="post('issue',{name:v('name')})">Issue ticket</button></div>
+ <div style="color:#9aa;margin-top:6px">The host gets a hash from the guest, never their secret.</div>
+ <hr style=border-color:#222244>
+ <div class=row><button onclick="post('reset',{max:5,cap:5000,resales:1})">Reset event (5 tickets, $50 cap)</button></div></div>
+<div class=card><h2>2 · Guest: prove ticket at the door</h2>
+ <div class=row><input id=who placeholder="guest label" value="alice"><button onclick="post('checkin',{name:v('who')})">Scan in (ZK proof)</button></div>
+ <div style="color:#9aa;margin-top:6px">Scan twice → rejected. Type a name that has no ticket (e.g. "mallory") → rejected.</div>
+ <hr style=border-color:#222244>
+ <b>Capped resale</b>
+ <div class=row><input id=from placeholder="seller" size=8 value="alice"><input id=to placeholder="buyer" size=8 value="bob"><input id=price size=5 value="45"><button onclick="post('resell',{from:v('from'),to:v('to'),price:v('price')})">Resell</button></div></div>
+<div class=card><h2>3 · What the public chain sees</h2><div id=pub></div></div>
+</div>
+<div class=card style="margin-top:14px"><h2>Event log</h2><div class=log id=log></div></div>
+<script>
+const v=id=>document.getElementById(id).value;
+async function post(p,b){render(await (await fetch('/api/'+p,{method:'POST',body:JSON.stringify(b)})).json())}
+function render(s){
+ pub.innerHTML=`<div>Tickets issued: <b>${s.issued}/${s.maxTickets}</b> · Checked in: <b>${s.checkedIn}</b> · Resold: <b>${s.resold}</b></div>
+ <div>Merkle leaves: <b>${s.leaves}</b> · root <code>${s.root}</code></div>
+ <div style="margin-top:8px">Spent nullifiers (unlinkable to any ticket):</div>${s.nullifiers.map(n=>`<span class=pill><code>${n}</code></span>`).join('')||'<i style=color:#9aa>none yet</i>'}
+ <div style="color:#9aa;margin-top:8px">No names, no addresses, no ticket IDs on-chain.</div>`;
+ log.innerHTML=s.log.map(l=>`<div class="${l.ok?'ok':'no'}">${l.ok?'✓':'✗'} ${l.msg}</div>`).join('');
+}
+fetch('/api/public').then(r=>r.json()).then(render);
+</script>
