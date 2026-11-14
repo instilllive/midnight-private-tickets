@@ -48,7 +48,9 @@ export class Chain {
   }
 
   get ledger(): Ledger {
-    return ledger(this.ctxState);
+    // Right after deploy the state is a ContractState; after a circuit call it is a ChargedState.
+    const s = this.ctxState;
+    return ledger(s instanceof (RT as any).ContractState ? s.data : s);
   }
 
   /** Run one circuit as a given user. State only advances if the circuit's asserts all pass. */

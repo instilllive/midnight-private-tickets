@@ -6,6 +6,8 @@ A Compact smart contract for the [Midnight](https://midnight.network) network (b
 Normal ticketing leaks a lot: the venue, the ticketing platform and anyone reading the chain can link your wallet, your ticket
 ID and every event you attend. Here the chain only ever stores hashes and one-time nullifiers.
 
+**Deck:** [`deck/index.html`](deck/index.html) · [PDF](deck/private-tickets-midnight-deck.pdf) · **Demo video:** [`demo/midnight-private-tickets.mp4`](demo/midnight-private-tickets.mp4) (≈100 s, phone · tablet · desktop)
+
 ## What it does
 | Step | Who | What is public | What stays private |
 |---|---|---|---|

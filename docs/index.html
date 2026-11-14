@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Private Tickets on Midnight — AKINDO Wave 3</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#0b0b14;--card:#15152a;--line:#2a2a4a;--ink:#e8e8f2;--dim:#9a9ab8;--p:#7466ff;--p2:#a99bff;--m:#7fffd4;--r:#ff8a8a}
+*{box-sizing:border-box;margin:0}
+html,body{background:#050509;height:100%;overflow:hidden}
+body{font-family:Inter,"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--ink)}
+#stage{position:fixed;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;padding:96px 120px;background:radial-gradient(1200px 700px at 85% -10%,#1d1a4a 0%,var(--bg) 60%);display:none;flex-direction:column}
+.slide.on{display:flex}
+.kicker{font:600 24px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--p2);margin-bottom:26px}
+h1{font-size:112px;line-height:1.02;letter-spacing:-.03em;font-weight:800}
+h2{font-size:68px;line-height:1.08;letter-spacing:-.02em;font-weight:800;margin-bottom:44px;max-width:1500px}
+p,li{font-size:34px;line-height:1.45;color:#cfcfe6}
+.dim{color:var(--dim)} .m{color:var(--m)} .p{color:var(--p2)} .r{color:var(--r)}
+code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+code{color:var(--m);font-size:.92em}
+.grid{display:grid;gap:28px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:34px 36px}
+.card h3{font-size:34px;margin-bottom:12px;color:#fff}
+.card p,.card li{font-size:28px;line-height:1.4}
+.card ul{padding-left:30px}
+.big{font-size:84px;font-weight:800;letter-spacing:-.03em;color:var(--m);line-height:1}
+.foot{margin-top:auto;display:flex;justify-content:space-between;font:500 22px ui-monospace,Menlo,monospace;color:#6b6b8c}
+.pill{display:inline-block;border:1px solid var(--p);color:var(--p2);border-radius:99px;padding:6px 20px;font:600 24px ui-monospace,Menlo,monospace;margin:0 10px 10px 0}
+.step{display:flex;gap:22px;align-items:flex-start;padding:20px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border:0}
+.n{flex:none;width:54px;height:54px;border-radius:50%;background:var(--p);color:#fff;font-weight:800;font-size:28px;display:grid;place-items:center}
+.ok{color:#8f8}.no{color:var(--r)}
+.term{background:#07070f;border:1px solid var(--line);border-radius:18px;padding:26px 32px;font:24px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#cfe;white-space:pre}
+.term .c{color:var(--dim)}
+table{border-collapse:collapse;width:100%}
+td,th{font-size:27px;text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);color:#cfcfe6}
+th{color:var(--p2);font:600 22px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}
+#nav{position:fixed;bottom:10px;right:14px;color:#6b6b8c;font:14px ui-monospace,monospace;z-index:9}
+@page{size:1920px 1080px;margin:0}
+@media print{
+ html,body{overflow:visible;background:#000;height:auto}
+ #stage{position:static;transform:none!important;width:1920px;height:auto}
+ .slide{position:relative;display:flex!important;page-break-after:always;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ #nav{display:none}
+}
+</style></head><body>
+<div id="stage">
+
+<!-- 1 TITLE -->
+<section class="slide on">
+ <div class="kicker">Midnight Buildathon · Wave 3 · AKINDO</div>
+ <div style="margin:auto 0">
+  <h1>Private Tickets<br><span class="p">on Midnight</span></h1>
+  <p style="font-size:48px;margin-top:40px;color:var(--ink);max-width:1400px">Prove you hold a valid ticket at the door, without revealing who you are or which ticket is yours.</p>
+  <div style="margin-top:50px"><span class="pill">Compact contract</span><span class="pill">zero-knowledge membership proof</span><span class="pill">one-time nullifiers</span><span class="pill">capped private resale</span></div>
+ </div>
+ <div class="foot"><span>Mark Flores · solo builder · @Dxter113</span><span>github.com/instilllive/midnight-private-tickets</span></div>
+</section>
+
+<!-- 2 PROBLEM -->
+<section class="slide" id="s2">
+ <div class="kicker">The problem</div>
+ <h2 style="margin-bottom:60px">Every ticket scan is a tracking event.</h2>
+ <div class="grid g3" style="margin-top:10px"><style>#s2 .card p{font-size:32px}</style>
+  <div class="card"><h3>The venue sees too much</h3><p>A scan ties your name, wallet or account to a seat and a time. Most doors only need one fact: <b>this ticket is valid and unused</b>.</p></div>
+  <div class="card"><h3>Platforms build profiles</h3><p>Ticketing and resale marketplaces link your purchases, your resales and every event you attend into one history.</p></div>
+  <div class="card"><h3>On-chain tickets make it worse</h3><p>An NFT ticket on a public chain is a permanent, linkable record: anyone can read which wallet went to which event.</p></div>
+ </div>
+ <p style="margin-top:90px;font-size:50px;color:#fff">Proving <span class="m">"I'm allowed in"</span> should not require saying <span class="r">"I'm Mark, seat 14B"</span>.</p>
+ <div class="foot"><span>Private Tickets on Midnight</span><span>2 / 10</span></div>
+</section>
+
+<!-- 3 WHY PRIVACY -->
+<section class="slide">
+ <div class="kicker">Why privacy matters for events</div>
+ <h2>Some events are sensitive by nature.</h2>
+ <div class="grid g2">
+  <div class="card"><h3>Who needs this</h3><ul><li>Private parties, member clubs and invite-only dinners</li><li>Support groups, health and community events</li><li>Political, activist and press events</li><li>Anyone who just doesn't want a lifelong attendance log</li></ul></div>
+  <div class="card"><h3>What the chain must not learn</h3><ul><li>Who you are (no name, no wallet address)</li><li>Which ticket is yours (the Merkle leaf stays hidden)</li><li>Who sold to whom on resale</li><li>That two scans came from the same person across events</li></ul></div>
+ </div>
+ <div class="card" style="margin-top:28px;border-color:var(--p)"><p style="color:#fff"><b class="m">Midnight's selective disclosure fits exactly:</b> publish the minimum (a Merkle root and a one-time nullifier), keep everything else on the guest's machine.</p></div>
+ <div class="foot"><span>Private Tickets on Midnight</span><span>3 / 10</span></div>
+</section>
+
+<!-- 4 HOW IT WORKS -->
+<section class="slide">
+ <div class="kicker">How it works</div>
+ <h2 style="margin-bottom:16px">Commitment → Merkle tree → proof → nullifier</h2>
+ <svg viewBox="0 0 1680 560" width="1680" height="560" font-family="ui-monospace,Menlo,Consolas,monospace">
+  <defs><marker id="a" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#a99bff"/></marker></defs>
+  <!-- guest -->
+  <rect x="0" y="40" width="360" height="190" rx="18" fill="#15152a" stroke="#7466ff" stroke-width="2"/>
+  <text x="24" y="82" fill="#a99bff" font-size="22" font-weight="700">GUEST · private</text>
+  <text x="24" y="124" fill="#fff" font-size="26">secret s</text>
+  <text x="24" y="164" fill="#7fffd4" font-size="22">pre  = H(s)</text>
+  <text x="24" y="202" fill="#7fffd4" font-size="22">null = H("null", s)</text>
+  <!-- host -->
+  <rect x="0" y="300" width="360" height="130" rx="18" fill="#15152a" stroke="#2a2a4a" stroke-width="2"/>
+  <text x="24" y="342" fill="#a99bff" font-size="22" font-weight="700">HOST</text>
+  <text x="24" y="382" fill="#fff" font-size="22">gets only pre,</text>
+  <text x="24" y="412" fill="#fff" font-size="22">never s</text>
+  <path d="M180 230 L180 296" stroke="#a99bff" stroke-width="3" marker-end="url(#a)" stroke-dasharray="8 6"/>
+  <text x="196" y="270" fill="#9a9ab8" font-size="18">1 commitment</text>
+  <g transform="translate(0,110)">
+  <!-- tree -->
+  <g stroke="#2a2a4a" stroke-width="2">
+   <line x1="720" y1="70" x2="580" y2="170"/><line x1="720" y1="70" x2="860" y2="170"/>
+   <line x1="580" y1="170" x2="510" y2="270"/><line x1="580" y1="170" x2="650" y2="270"/><line x1="860" y1="170" x2="790" y2="270"/><line x1="860" y1="170" x2="930" y2="270"/>
+  </g>
+  <g stroke="#7fffd4" stroke-width="4"><line x1="720" y1="70" x2="580" y2="170"/><line x1="580" y1="170" x2="650" y2="270"/></g>
+  <g fill="#15152a" stroke="#2a2a4a" stroke-width="2">
+   <circle cx="720" cy="70" r="30"/><circle cx="580" cy="170" r="26"/><circle cx="860" cy="170" r="26"/>
+   <circle cx="510" cy="270" r="24"/><circle cx="790" cy="270" r="24"/><circle cx="930" cy="270" r="24"/>
+  </g>
+  <circle cx="720" cy="70" r="30" fill="#15152a" stroke="#7fffd4" stroke-width="4"/>
+  <circle cx="580" cy="170" r="26" fill="#15152a" stroke="#7fffd4" stroke-width="4"/>
+  <circle cx="650" cy="270" r="26" fill="#7466ff" stroke="#7fffd4" stroke-width="4"/>
+  <text x="720" y="78" fill="#7fffd4" font-size="20" text-anchor="middle">root</text>
+  <text x="650" y="278" fill="#fff" font-size="16" text-anchor="middle">leaf</text>
+  <text x="720" y="330" fill="#fff" font-size="22" text-anchor="middle">HistoricMerkleTree&lt;10&gt;</text>
+  <text x="720" y="362" fill="#9a9ab8" font-size="20" text-anchor="middle">leaf = H(pre, resale count) · up to 1,024 tickets</text>
+  </g>
+  <path d="M362 365 L476 392" stroke="#a99bff" stroke-width="3" marker-end="url(#a)" stroke-dasharray="8 6"/>
+  <text x="376" y="352" fill="#9a9ab8" font-size="18">2 insert leaf</text>
+  <!-- proof -->
+  <rect x="1040" y="40" width="300" height="190" rx="18" fill="#1d1a4a" stroke="#7466ff" stroke-width="3"/>
+  <text x="1060" y="82" fill="#a99bff" font-size="22" font-weight="700">ZK PROOF</text>
+  <text x="1060" y="122" fill="#fff" font-size="20">"I know s whose leaf</text>
+  <text x="1060" y="150" fill="#fff" font-size="20">is under this root,</text>
+  <text x="1060" y="178" fill="#fff" font-size="20">and null is fresh."</text>
+  <text x="1060" y="212" fill="#7fffd4" font-size="18">~5.4 KB · 1.6–3.5 s</text>
+  <path d="M362 120 L1036 120" stroke="#a99bff" stroke-width="3" marker-end="url(#a)"/>
+  <text x="470" y="100" fill="#9a9ab8" font-size="18">3 at the door: s + Merkle path (stay local)</text>
+  <!-- ledger -->
+  <rect x="1040" y="300" width="640" height="200" rx="18" fill="#15152a" stroke="#7fffd4" stroke-width="2"/>
+  <text x="1064" y="342" fill="#7fffd4" font-size="22" font-weight="700">PUBLIC LEDGER · sees only</text>
+  <text x="1064" y="384" fill="#fff" font-size="22">• Merkle root used</text>
+  <text x="1064" y="418" fill="#fff" font-size="22">• nullifier → inserted in a Set</text>
+  <text x="1064" y="452" fill="#fff" font-size="22">• counters</text>
+  <text x="1064" y="486" fill="#ff8a8a" font-size="20">Same nullifier twice → assert fails</text>
+  <path d="M1190 232 L1190 296" stroke="#7fffd4" stroke-width="3" marker-end="url(#a)"/>
+  <text x="1206" y="270" fill="#9a9ab8" font-size="18">4 root + nullifier</text>
+ </svg>
+ <div class="foot"><span>contract/private-tickets.compact · ~100 lines · issueTicket · checkIn · resellTicket</span><span>4 / 10</span></div>
+</section>
+
+<!-- 5 LIVE DEMO -->
+<section class="slide">
+ <div class="kicker">Live demo summary</div>
+ <h2 style="margin-bottom:20px">One scenario, every rule enforced.</h2>
+ <div class="grid g2" style="gap:50px">
+  <div>
+   <div class="step"><div class="n">1</div><p><b>Host issues tickets</b> to Alice and Bob. Only hashes enter the tree.</p></div>
+   <div class="step"><div class="n">2</div><p><b>Alice checks in</b> with a ZK proof. <span class="ok">IN</span> · ledger learns a nullifier.</p></div>
+   <div class="step"><div class="n">3</div><p><b>Second scan</b> of Alice's ticket: <span class="no">REJECTED</span> (nullifier repeats).</p></div>
+  </div>
+  <div>
+   <div class="step"><div class="n">4</div><p><b>Stranger "Mallory"</b> with no ticket: <span class="no">REJECTED</span>.</p></div>
+   <div class="step"><div class="n">5</div><p><b>Resale at $120</b> vs. $50 cap: <span class="no">REJECTED</span>. At <b>$45</b>: <span class="ok">OK</span>, old ticket dies, buyer gets a fresh one.</p></div>
+   <div class="step"><div class="n">6</div><p><b>Public ledger</b> panel: hashes and nullifiers only. No names, addresses or ticket IDs.</p></div>
+  </div>
+ </div>
+ <div class="card" style="margin-top:30px"><p>Run it: <code>npm run ui</code> → host · guest · public-ledger panels on <code>localhost:8799</code>. Or <code>npm run demo</code> for the narrated terminal run. Video: <span class="m">demo/midnight-private-tickets.mp4</span> (phone · tablet · desktop).</p></div>
+ <div class="foot"><span>Private Tickets on Midnight</span><span>5 / 10</span></div>
+</section>
+
+<!-- 6 EVIDENCE -->
+<section class="slide">
+ <div class="kicker">Evidence: tests and proofs</div>
+ <h2 style="margin-bottom:24px">12 / 12 tests. Real proofs from the real proof server.</h2>
+ <div class="grid g2" style="gap:34px">
+  <div class="term"><span class="c">$ npm test</span>
+ ✓ host issues tickets; ledger holds only commitments
+ ✓ only the host can issue
+ ✓ enforces the ticket supply
+ ✓ valid guest checks in; ledger learns only a nullifier
+ ✓ rejects a second scan (nullifier)
+ ✓ rejects someone who never got a ticket
+ ✓ rejects a ticket with a forged resale count
+ ✓ every guest can check in once; door count matches
+ ✓ capped private resale: old ticket dies
+ ✓ resale above the cap is rejected
+ ✓ resale limit holds (anti-scalping)
+ ✓ a spent ticket cannot be resold after check-in
+ <span class="ok">Tests  12 passed (12)</span></div>
+  <div>
+   <div class="term" style="margin-bottom:28px"><span class="c">$ npm run prove</span>   <span class="c"># proof server 9.0.0</span>
+ ✓ issueTicket   ZK proof  5420 bytes  2.0s
+ ✓ resellTicket  ZK proof  5420 bytes  3.5s
+ ✓ checkIn       ZK proof  5420 bytes  1.6s</div>
+   <div class="grid g2" style="gap:20px">
+    <div class="card"><div class="big">12</div><p>tests: success paths + every rejection</p></div>
+    <div class="card"><div class="big">3</div><p>circuits proved for real</p></div>
+   </div>
+   <p style="margin-top:22px;font-size:26px" class="dim">Proof server built from source (midnight-ledger tag proof-server-9.0.0). Contract compiles with Compact 0.36.0 (language 0.28, runtime 0.21).</p>
+  </div>
+ </div>
+ <div class="foot"><span>Reproduce: npm install · npm run compile · npm test · npm run prove</span><span>6 / 10</span></div>
+</section>
+
+<!-- 7 NEW IN THIS WAVE -->
+<section class="slide">
+ <div class="kicker">What's new in this wave</div>
+ <h2>A new Compact codebase for Midnight.</h2>
+ <div class="grid g2" style="gap:34px">
+  <div class="card"><h3>New this wave (Midnight)</h3><ul>
+   <li>Compact contract: <code>issueTicket</code>, <code>checkIn</code>, <code>resellTicket</code></li>
+   <li>Merkle-membership proof with a one-time nullifier</li>
+   <li>Capped, unlinkable private resale with a per-ticket limit</li>
+   <li>12-test suite and real proofs via proof server 9.0.0</li>
+   <li>Host / guest / public-ledger web UI, deck and video</li></ul></div>
+  <div class="card"><h3>Prior work, kept separate</h3><ul>
+   <li>Earlier Private Tickets apps on NEAR and Solana (Metaplex Core) share the <b>idea</b>, not code</li>
+   <li>Nothing from those was copied: Compact, the circuits and the proofs are written fresh</li>
+   <li>Private Tickets on Midnight is a new repo, MIT licensed</li></ul></div>
+ </div>
+ <div class="card" style="margin-top:30px"><p><b class="p">Honest status:</b> the demo runs the compiled contract logic locally and real proofs via a local proof server. It is <b>not yet deployed to a public Midnight network</b>, and resale price is a rule check, not a payment. No mainnet use.</p></div>
+ <div class="foot"><span>Private Tickets on Midnight</span><span>7 / 10</span></div>
+</section>
+
+<!-- 8 BUSINESS -->
+<section class="slide">
+ <div class="kicker">Business angle</div>
+ <h2>Private-event hosts are the customer.</h2>
+ <div class="grid g3">
+  <div class="card"><h3>Who pays</h3><p>Hosts of invite-only and sensitive events: clubs, communities, conferences, support groups. They want a guest list that cannot become a surveillance log.</p></div>
+  <div class="card"><h3>How it earns</h3><ul><li>Per-event fee for issuing and door verification</li><li>Small fee on capped resales</li><li>Hosted door-scanner and analytics (aggregate only)</li></ul></div>
+  <div class="card"><h3>Why it wins</h3><ul><li>Hosts get fraud-proof check-in and anti-scalping</li><li>Guests get real privacy, a reason to choose these events</li><li>Midnight makes it possible without a trusted middleman</li></ul></div>
+ </div>
+ <div class="card" style="margin-top:30px;border-color:var(--p)"><p>Go-to-market: start with small private events, learn from hosts, then add paid primary sales and shielded resale payments. <span class="dim">(Hypothesis to validate; no revenue yet.)</span></p></div>
+ <div class="foot"><span>Private Tickets on Midnight</span><span>8 / 10</span></div>
+</section>
+
+<!-- 9 ROADMAP -->
+<section class="slide">
+ <div class="kicker">Roadmap</div>
+ <h2>From contract to door-ready product.</h2>
+ <div class="grid g4" style="gap:22px">
+  <div class="card"><div class="pill">Now</div><h3>Done</h3><ul><li>Compact contract</li><li>12 tests</li><li>Real proofs</li><li>Local UI + demo</li></ul></div>
+  <div class="card"><div class="pill">Next</div><h3>Preview deploy</h3><ul><li>Lace wallet + faucet</li><li>UI on real transactions</li><li>Proof server in the loop</li></ul></div>
+  <div class="card"><div class="pill">Then</div><h3>Payments</h3><ul><li>Shielded-token resale</li><li>Atomic swap with the cap</li><li>Paid primary sales</li></ul></div>
+  <div class="card"><div class="pill">Later</div><h3>At the door</h3><ul><li>QR-encoded proofs, scanner app</li><li>Batch issuing, bigger anonymity set</li><li>Souvenir mode: lock resale after check-in</li><li>Security review</li></ul></div>
+ </div>
+ <div class="foot"><span>Private Tickets on Midnight</span><span>9 / 10</span></div>
+</section>
+
+<!-- 10 TEAM -->
+<section class="slide">
+ <div class="kicker">Team and links</div>
+ <h2>Built solo, in public.</h2>
+ <div class="grid g2" style="gap:40px">
+  <div class="card"><h3>Mark Flores</h3><p>Solo builder, Virginia, USA. "Secure Event Pass System" won <b class="m">2nd place at Nitro 05</b>. Has shipped Private Tickets apps on NEAR and Solana; this is the Midnight version.</p>
+   <p style="margin-top:18px" class="p">@Dxter113 on X</p></div>
+  <div class="card"><h3>Links</h3>
+   <p><span class="dim">Repo (MIT):</span><br><code>github.com/instilllive/midnight-private-tickets</code></p>
+   <p style="margin-top:14px"><span class="dim">Demo video:</span><br><code>demo/midnight-private-tickets.mp4</code></p>
+   <p style="margin-top:14px"><span class="dim">Run:</span><br><code>npm install &amp;&amp; npm run compile &amp;&amp; npm test &amp;&amp; npm run ui</code></p></div>
+ </div>
+ <p style="margin-top:50px;font-size:46px;color:#fff;text-align:center">Prove you belong, <span class="m">without saying who you are.</span></p>
+ <div class="foot"><span>Private Tickets on Midnight · prototype, not audited · no mainnet</span><span>10 / 10</span></div>
+</section>
+
+</div>
+<div id="nav">← → to navigate</div>
+<script>
+const S=[...document.querySelectorAll('.slide')];let i=0;
+const st=document.getElementById('stage');
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);st.style.transform=`translate(${-960*k}px,${-540*k}px) scale(${k})`}
+function show(n){i=Math.max(0,Math.min(S.length-1,n));S.forEach((s,j)=>s.classList.toggle('on',j===i));location.hash=i+1}
+addEventListener('resize',fit);fit();
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key))show(i+1);if(['ArrowLeft','PageUp','Backspace'].includes(e.key))show(i-1);if(e.key==='Home')show(0);if(e.key==='End')show(S.length-1)});
+addEventListener('click',e=>show(e.clientX>innerWidth/2?i+1:i-1));
+if(location.hash)show(parseInt(location.hash.slice(1))-1||0);
+</script>
+</body></html>

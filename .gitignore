@@ -2,3 +2,4 @@ node_modules/
 contract/managed/
 .env*
 *.log
+demo/work/

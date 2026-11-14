@@ -1,0 +1,224 @@
+1
+0:00:00,300 --> 0:00:03,030
+Private Tickets for the Midnight Buildathon,
+
+2
+0:00:03,030 --> 0:00:03,470
+Wave 3.
+
+3
+0:00:03,470 --> 0:00:05,640
+Normal ticketing leaks who you are,
+
+4
+0:00:05,640 --> 0:00:06,880
+which seat is yours,
+
+5
+0:00:06,880 --> 0:00:08,560
+and every event you attend.
+
+6
+0:00:08,560 --> 0:00:08,870
+Here,
+
+7
+0:00:08,870 --> 0:00:10,980
+you prove you hold a valid ticket,
+
+8
+0:00:10,980 --> 0:00:12,040
+and nothing else.
+
+9
+0:00:12,840 --> 0:00:16,980
+Under the hood it's one Compact contract with three circuits:
+
+10
+0:00:16,980 --> 0:00:17,870
+issue ticket,
+
+11
+0:00:17,870 --> 0:00:18,480
+check in,
+
+12
+0:00:18,480 --> 0:00:19,700
+and resell ticket.
+
+13
+0:00:20,500 --> 0:00:20,890
+First,
+
+14
+0:00:20,890 --> 0:00:22,460
+the host issues tickets.
+
+15
+0:00:22,460 --> 0:00:25,910
+Each guest keeps a secret and hands over only a hash,
+
+16
+0:00:25,910 --> 0:00:27,610
+so the host never sees it.
+
+17
+0:00:27,610 --> 0:00:29,690
+Alice and Bob each get a ticket.
+
+18
+0:00:30,490 --> 0:00:31,250
+At the door,
+
+19
+0:00:31,250 --> 0:00:32,200
+Alice scans in.
+
+20
+0:00:32,200 --> 0:00:36,130
+A zero-knowledge Merkle proof shows her ticket is in the tree,
+
+21
+0:00:36,130 --> 0:00:39,110
+and the chain learns only a one-time nullifier.
+
+22
+0:00:39,910 --> 0:00:41,620
+Scan the same ticket again,
+
+23
+0:00:41,620 --> 0:00:43,260
+and the nullifier repeats,
+
+24
+0:00:43,260 --> 0:00:44,970
+so the contract rejects it.
+
+25
+0:00:45,770 --> 0:00:49,140
+A stranger with no ticket can't build a valid proof,
+
+26
+0:00:49,140 --> 0:00:50,880
+so Mallory is rejected too.
+
+27
+0:00:51,680 --> 0:00:52,720
+Resale is capped.
+
+28
+0:00:52,720 --> 0:00:55,690
+Bob tries to sell for one hundred twenty dollars,
+
+29
+0:00:55,690 --> 0:00:57,270
+over the fifty dollar cap,
+
+30
+0:00:57,270 --> 0:00:58,060
+and it fails.
+
+31
+0:00:58,060 --> 0:01:00,370
+At forty five dollars it goes through.
+
+32
+0:01:00,370 --> 0:01:01,590
+The old ticket dies,
+
+33
+0:01:01,590 --> 0:01:04,020
+and a fresh one is minted for the buyer.
+
+34
+0:01:04,820 --> 0:01:05,480
+Meanwhile,
+
+35
+0:01:05,480 --> 0:01:08,870
+the public ledger holds only hashes and nullifiers.
+
+36
+0:01:08,870 --> 0:01:10,130
+There are no names,
+
+37
+0:01:10,130 --> 0:01:10,990
+no addresses,
+
+38
+0:01:10,990 --> 0:01:12,450
+and no ticket numbers.
+
+39
+0:01:13,250 --> 0:01:14,800
+All twelve tests pass,
+
+40
+0:01:14,800 --> 0:01:16,920
+covering every rejection path:
+
+41
+0:01:16,920 --> 0:01:18,050
+the double scan,
+
+42
+0:01:18,050 --> 0:01:18,760
+no ticket,
+
+43
+0:01:18,760 --> 0:01:20,310
+a forged resale count,
+
+44
+0:01:20,310 --> 0:01:21,580
+an over-cap price,
+
+45
+0:01:21,580 --> 0:01:23,410
+and resale after check-in.
+
+46
+0:01:23,410 --> 0:01:25,530
+The real Midnight proof server
+
+47
+0:01:25,530 --> 0:01:27,790
+then generates all three proofs,
+
+48
+0:01:27,790 --> 0:01:29,620
+about five kilobytes each,
+
+49
+0:01:29,620 --> 0:01:30,820
+in a few seconds.
+
+50
+0:01:31,620 --> 0:01:33,400
+Built solo by Mark Flores,
+
+51
+0:01:33,400 --> 0:01:34,150
+in Compact.
+
+52
+0:01:34,150 --> 0:01:35,650
+It runs locally today,
+
+53
+0:01:35,650 --> 0:01:37,500
+with a Preview deploy next.
+
+54
+0:01:37,500 --> 0:01:38,600
+Private Tickets:
+
+55
+0:01:38,600 --> 0:01:39,760
+prove you belong,
+
+56
+0:01:39,760 --> 0:01:41,600
+without saying who you are.
+
